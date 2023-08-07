@@ -54,7 +54,7 @@ describe('TasksController', () => {
     it('should call tasksService deleteTask with the correct value', async () => {
       controller.deleteTask({ id: 'id' });
 
-      expect(deleteTaskMock).toBeCalledWith('id');
+      expect(deleteTaskMock).toBeCalledWith({ id: 'id' });
     });
   });
 });

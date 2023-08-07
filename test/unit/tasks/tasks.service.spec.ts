@@ -39,7 +39,7 @@ describe('TasksService', () => {
   describe('deleteTask', () => {
     it('should delete a task', async () => {
       const task = service.createTask(taskMock);
-      service.deleteTask(task.id);
+      service.deleteTask({ id: task.id });
       const tasks = service.getTasks();
 
       expect(tasks).toStrictEqual([]);
