@@ -1,9 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TasksController } from '../../../src/tasks/tasks.controller';
 import { TasksService } from '../../../src/tasks/tasks.service';
+import { taskMock } from './tasks.mock';
 
 describe('TasksController', () => {
-  let tasksController: TasksController;
+  let controller: TasksController;
+  let service: TasksService;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
@@ -11,10 +13,35 @@ describe('TasksController', () => {
       providers: [TasksService],
     }).compile();
 
-    tasksController = app.get<TasksController>(TasksController);
+    controller = app.get<TasksController>(TasksController);
+    service = app.get<TasksService>(TasksService);
   });
 
-  it('should return get a list of tasks', () => {
-    expect(tasksController.getTasks()).toStrictEqual([]);
+  describe('getTasks', () => {
+    let getTasksMock: jest.SpyInstance;
+
+    beforeEach(() => {
+      getTasksMock = jest.spyOn(service, 'getTasks');
+    });
+
+    it('should call tasksService getTasks method', () => {
+      controller.getTasks();
+
+      expect(getTasksMock).toBeCalled();
+    });
+  });
+
+  describe('createTask', () => {
+    let createTaskMock: jest.SpyInstance;
+
+    beforeEach(() => {
+      createTaskMock = jest.spyOn(service, 'createTask');
+    });
+
+    it('should call tasksService createTask with the correct value', async () => {
+      controller.createTask(taskMock);
+
+      expect(createTaskMock).toBeCalledWith(taskMock);
+    });
   });
 });
