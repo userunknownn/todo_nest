@@ -1,8 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TasksService } from '../../../src/tasks/tasks.service';
 import { taskMock } from './tasks.mock';
+import { v4 as uuid } from 'uuid';
 
-describe('TasksController', () => {
+jest.mock('uuid');
+
+describe('TasksService', () => {
   let service: TasksService;
 
   beforeEach(async () => {
@@ -23,11 +26,23 @@ describe('TasksController', () => {
   });
 
   describe('createTask', () => {
-    it('should create a task', async () => {
+    it('should create a task', () => {
+      uuid.mockReturnValue('mocked-uuid');
+
       service.createTask(taskMock);
       const tasks = service.getTasks();
 
-      expect(tasks).toStrictEqual([taskMock]);
+      expect(tasks).toStrictEqual([{ ...taskMock, id: 'mocked-uuid' }]);
+    });
+  });
+
+  describe('deleteTask', () => {
+    it('should delete a task', async () => {
+      const task = service.createTask(taskMock);
+      service.deleteTask(task.id);
+      const tasks = service.getTasks();
+
+      expect(tasks).toStrictEqual([]);
     });
   });
 });

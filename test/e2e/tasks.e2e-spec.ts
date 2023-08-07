@@ -22,7 +22,7 @@ describe('TasksController (e2e)', () => {
     });
 
     it('/tasks (GET) success with tasks', async () => {
-      await request(app.getHttpServer()).post('/tasks').send({
+      const response = await request(app.getHttpServer()).post('/tasks').send({
         title: 'test',
         description: 'test',
       });
@@ -30,17 +30,22 @@ describe('TasksController (e2e)', () => {
       return request(app.getHttpServer())
         .get('/tasks')
         .expect(200)
-        .expect([{ title: 'test', description: 'test' }]);
+        .expect([response.body]);
     });
   });
 
   describe('/tasks (POST)', () => {
-    it('/tasks (POST) success', () => {
-      return request(app.getHttpServer())
+    it('/tasks (POST) success', async () => {
+      const response = await request(app.getHttpServer())
         .post('/tasks')
         .send({ title: 'test', description: 'test' })
-        .expect(201)
-        .expect({ title: 'test', description: 'test' });
+        .expect(201);
+
+      expect(response.body).toStrictEqual({
+        title: 'test',
+        description: 'test',
+        id: response.body.id,
+      });
     });
 
     it('/tasks (POST) fail should not be empty', () => {
@@ -68,6 +73,21 @@ describe('TasksController (e2e)', () => {
           error: 'Bad Request',
           statusCode: 400,
         });
+    });
+  });
+
+  describe('/tasks/:id (DELETE)', () => {
+    it('/tasks/:id (DELETE) success', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/tasks')
+        .send({ title: 'test', description: 'test' });
+
+      await request(app.getHttpServer())
+        .delete(`/tasks/${response.body.id}`)
+        .expect(200)
+        .expect({ id: response.body.id });
+
+      return request(app.getHttpServer()).get('/tasks').expect(200).expect([]);
     });
   });
 });

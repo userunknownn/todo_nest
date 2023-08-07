@@ -44,4 +44,17 @@ describe('TasksController', () => {
       expect(createTaskMock).toBeCalledWith(taskMock);
     });
   });
+
+  describe('deleteTask', () => {
+    let deleteTaskMock: jest.SpyInstance;
+    beforeEach(() => {
+      deleteTaskMock = jest.spyOn(service, 'deleteTask');
+    });
+
+    it('should call tasksService deleteTask with the correct value', async () => {
+      controller.deleteTask({ id: 'id' });
+
+      expect(deleteTaskMock).toBeCalledWith('id');
+    });
+  });
 });
