@@ -17,8 +17,20 @@ describe('TasksController (e2e)', () => {
   });
 
   describe('/tasks (GET)', () => {
-    it('/tasks (GET) success', () => {
+    it('/tasks (GET) success without tasks', () => {
       return request(app.getHttpServer()).get('/tasks').expect(200).expect([]);
+    });
+
+    it('/tasks (GET) success with tasks', async () => {
+      await request(app.getHttpServer()).post('/tasks').send({
+        title: 'test',
+        description: 'test',
+      });
+
+      return request(app.getHttpServer())
+        .get('/tasks')
+        .expect(200)
+        .expect([{ title: 'test', description: 'test' }]);
     });
   });
 
