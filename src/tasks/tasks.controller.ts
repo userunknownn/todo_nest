@@ -1,6 +1,19 @@
-import { Injectable, Controller, Get, Body, Post } from '@nestjs/common';
+import {
+  Injectable,
+  Controller,
+  Get,
+  Body,
+  Post,
+  Delete,
+  Param,
+} from '@nestjs/common';
 import { TasksService } from './tasks.service';
-import { TasksRequest } from './dto/tasks.dto';
+import {
+  CreateTaskRequest,
+  CreateTaskResponse,
+  DeleteTaskRequest,
+  DeleteTaskResponse,
+} from './dto/tasks.dto';
 @Injectable()
 @Controller('tasks')
 export class TasksController {
@@ -12,7 +25,12 @@ export class TasksController {
   }
 
   @Post()
-  createTask(@Body() task: TasksRequest) {
-    return this.service.createTask(task);
+  createTask(@Body() request: CreateTaskRequest): CreateTaskResponse {
+    return this.service.createTask(request);
+  }
+
+  @Delete(':id')
+  deleteTask(@Param() request: DeleteTaskRequest): DeleteTaskResponse {
+    return this.service.deleteTask(request);
   }
 }

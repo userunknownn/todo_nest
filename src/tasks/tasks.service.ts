@@ -1,16 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { TasksRequest } from './dto/tasks.dto';
+import {
+  CreateTaskRequest,
+  DeleteTaskRequest,
+  DeleteTaskResponse,
+} from './dto/tasks.dto';
+import { v4 as uuid } from 'uuid';
+import { Task } from './types/task.type';
 
 @Injectable()
 export class TasksService {
-  private tasks = [];
+  private tasks: Task[] = [];
 
-  getTasks() {
+  getTasks(): Task[] {
     return this.tasks;
   }
 
-  createTask(task: TasksRequest) {
-    this.tasks.push(task);
-    return task;
+  createTask(task: CreateTaskRequest): Task {
+    const id = uuid();
+    this.tasks.push({ ...task, id });
+    return { ...task, id };
+  }
+
+  deleteTask({ id }: DeleteTaskRequest): DeleteTaskResponse {
+    this.tasks = this.tasks.filter((task: Task) => task.id !== id);
+    return { id };
   }
 }
