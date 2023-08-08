@@ -1,0 +1,9 @@
+services: 
+  backend: 
+    build: .
+    ports: 
+      - "3000:3000"
+    volumes:
+      - .:/todo-app
+    container_name: todo-backend
+    entrypoint: ["yarn", "start:dev"]
