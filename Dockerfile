@@ -8,4 +8,6 @@ RUN yarn
 
 COPY . /todo-app
 
+RUN ["git", "config", "--global", "--add", "safe.directory", "/todo-app"]
+
 EXPOSE 3000
