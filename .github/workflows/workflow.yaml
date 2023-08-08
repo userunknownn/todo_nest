@@ -9,24 +9,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-     - name: Testing workflow file
-       run: echo "some text"
-     # - name: Checkout code
-      #  uses: actions/checkout@v3 
+
+      - name: 'Checkout code'
+        uses: actions/checkout@v3 
       
-      #- name: Setup node version
-      #  uses: actions/setup-node@v3
-      #  with:
-      #    node-version: '16'
+      - name: 'Setup node version'
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
 
-     # - name: Install dependencies
-      #  run: yarn;
+      - name: 'Install dependencies'
+        run: yarn;
 
-      #- name: Unit tests
-       # run: yarn test;
+      - name: 'Unit tests'
+        run: yarn test;
 
-    #  - name: Functional Tests
-    #    run: yarn test:e2e;
+      - name: 'Functional Tests'
+        run: yarn test:e2e;
 
-     # - name: Building project
-     #     yarn build;
+      - name: 'Building project'
+        run: yarn build;
