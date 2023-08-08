@@ -15,6 +15,21 @@ export class DeleteTaskRequest {
   @IsString()
   readonly id: string;
 }
+export class UpdateTaskRequest {
+  @IsNotEmpty()
+  @IsString()
+  readonly id: string;
+}
+
+export class UpdateTaskPatchRequest {
+  @IsNotEmpty()
+  @IsString()
+  readonly title: string;
+
+  @IsNotEmpty()
+  @IsString()
+  readonly description: string;
+}
 
 export class CreateTaskResponse {
   title: string;
@@ -23,5 +38,11 @@ export class CreateTaskResponse {
 }
 
 export class DeleteTaskResponse {
+  id: string;
+}
+
+export class UpdateTaskResponse {
+  title: string;
+  description: string;
   id: string;
 }

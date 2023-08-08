@@ -1,3 +1,1 @@
-import { CreateTaskRequest } from '../dto/tasks.dto';
-
-export type Task = CreateTaskRequest & { id: string };
+export type Task = { title: string; description: string; id: string };
