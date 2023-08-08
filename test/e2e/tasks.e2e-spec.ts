@@ -90,4 +90,34 @@ describe('TasksController (e2e)', () => {
       return request(app.getHttpServer()).get('/tasks').expect(200).expect([]);
     });
   });
+
+  describe('/tasks/:id (PATCH)', () => {
+    it('/tasks/:id (PATCH) success', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/tasks')
+        .send({ title: 'test', description: 'test' });
+
+      const patchResponse = await request(app.getHttpServer())
+        .patch(`/tasks/${response.body.id}`)
+        .send({ title: 'anotherTitle', description: 'test' })
+        .expect(200);
+
+      expect(patchResponse.body).toStrictEqual({
+        title: 'anotherTitle',
+        description: 'test',
+        id: response.body.id,
+      });
+    });
+
+    it('/tasks/:id (PATCH) fail when there is no task with that id', async () => {
+      return request(app.getHttpServer())
+        .patch('/tasks/someId')
+        .send({ title: 'anotherTitle', description: 'test' })
+        .expect(404)
+        .expect({
+          message: 'Task not found',
+          statusCode: 404,
+        });
+    });
+  });
 });

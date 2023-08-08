@@ -45,4 +45,28 @@ describe('TasksService', () => {
       expect(tasks).toStrictEqual([]);
     });
   });
+
+  describe('updateTask', () => {
+    it('should update a task', async () => {
+      const task = service.createTask(taskMock);
+      const updatedTask = service.updateTask({
+        id: task.id,
+        title: 'new title',
+        description: 'new description',
+      });
+      const tasks = service.getTasks();
+
+      expect(tasks).toStrictEqual([{ ...updatedTask, id: task.id }]);
+    });
+
+    it('should throw an error if the task does not exists', () => {
+      expect(() =>
+        service.updateTask({
+          id: 'invalid-id',
+          title: 'new title',
+          description: 'new description',
+        }),
+      ).toThrowError('Task not found');
+    });
+  });
 });

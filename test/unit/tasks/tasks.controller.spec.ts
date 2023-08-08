@@ -57,4 +57,35 @@ describe('TasksController', () => {
       expect(deleteTaskMock).toBeCalledWith({ id: 'id' });
     });
   });
+
+  describe('updateTask', () => {
+    let updateTaskMock: jest.SpyInstance;
+
+    beforeEach(() => {
+      updateTaskMock = jest.spyOn(service, 'updateTask');
+    });
+
+    it('should call tasksService updateTask with the correct value', async () => {
+      const task = controller.createTask(taskMock);
+      controller.updateTask(
+        { id: task.id },
+        { ...taskMock, title: 'new title' },
+      );
+
+      expect(updateTaskMock).toBeCalledWith({
+        id: task.id,
+        ...taskMock,
+        title: 'new title',
+      });
+    });
+
+    it('should throw an error if the task is not found', async () => {
+      expect(() =>
+        controller.updateTask(
+          { id: 'not-found' },
+          { ...taskMock, title: 'new title' },
+        ),
+      ).toThrowError('Task not found');
+    });
+  });
 });
