@@ -1,0 +1,14 @@
+datasource db {
+    provider = "mysql"
+    url = env("DATABASE_URL") 
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model Task {
+  id     String     @id  @db.VarChar(255)
+  title    String   @db.VarChar(255)
+  description   String?   @db.VarChar(255)
+}
