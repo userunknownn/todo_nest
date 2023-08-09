@@ -7,10 +7,15 @@ echo "Prisma orm setup";
 yarn prisma generate;
 yarn prisma migrate reset --force;
 
-echo "Unit tests"
+echo "\n################################################";
+echo "################## Unit tests ##################";
+echo "################################################\n";
+
 yarn test;
 
-echo "Functional Tests"
+echo "\n################################################";
+echo "############### Functional tests ###############";
+echo "################################################\n";
 yarn test:e2e;
 
 
