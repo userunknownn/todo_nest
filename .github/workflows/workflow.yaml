@@ -17,7 +17,7 @@ jobs:
         run: docker-compose up -d
 
       - name: 'Access the backend container'
-        run: docker-exec -it todo-backend bash;
+        run: docker exec -it todo-backend bash;
 
       - name: 'Unit tests'
         run: yarn test;
