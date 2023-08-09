@@ -2,15 +2,18 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../../src/app.module';
+import { PrismaClient } from '@prisma/client';
 
 describe('TasksController (e2e)', () => {
   let app: INestApplication;
+  const prisma: PrismaClient = new PrismaClient();
 
   beforeEach(async () => {
+    await prisma.task.deleteMany();
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
-
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
@@ -85,7 +88,7 @@ describe('TasksController (e2e)', () => {
       await request(app.getHttpServer())
         .delete(`/tasks/${response.body.id}`)
         .expect(200)
-        .expect({ id: response.body.id });
+        .expect(response.body);
 
       return request(app.getHttpServer()).get('/tasks').expect(200).expect([]);
     });

@@ -2,35 +2,61 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TasksService } from '../../../src/tasks/tasks.service';
 import { taskMock } from './tasks.mock';
 import { v4 as uuid } from 'uuid';
+import { TasksRepository } from '../../../src/tasks/tasks.repository';
+import { PrismaClient } from '@prisma/client';
+import { TaskNotFoundException } from '../../../src/tasks/exceptions/task-not-found.exception';
 
 jest.mock('uuid');
 
 describe('TasksService', () => {
   let service: TasksService;
+  let repository: TasksRepository;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [],
-      providers: [TasksService],
+      providers: [
+        TasksService,
+        TasksRepository,
+        {
+          provide: TasksRepository,
+          useValue: {
+            findAll: jest.fn().mockResolvedValue([]),
+            create: jest
+              .fn()
+              .mockResolvedValue({ ...taskMock, id: 'mocked-uuid' }),
+            delete: jest.fn(),
+            update: jest.fn(),
+          },
+        },
+        PrismaClient,
+      ],
     }).compile();
 
     service = app.get<TasksService>(TasksService);
+    repository = app.get<TasksRepository>(TasksRepository);
   });
 
   describe('getTasks', () => {
-    it('should return get the tasks list', () => {
-      const tasks = service.getTasks();
+    it('should return get the tasks list', async () => {
+      const tasks = await service.getTasks();
 
       expect(tasks).toStrictEqual([]);
     });
   });
 
   describe('createTask', () => {
-    it('should create a task', () => {
+    beforeEach(() => {
       uuid.mockReturnValue('mocked-uuid');
 
-      service.createTask(taskMock);
-      const tasks = service.getTasks();
+      jest
+        .spyOn(repository, 'findAll')
+        .mockResolvedValueOnce([{ ...taskMock, id: 'mocked-uuid' }]);
+    });
+
+    it('should create a task', async () => {
+      await service.createTask(taskMock);
+      const tasks = await service.getTasks();
 
       expect(tasks).toStrictEqual([{ ...taskMock, id: 'mocked-uuid' }]);
     });
@@ -38,35 +64,39 @@ describe('TasksService', () => {
 
   describe('deleteTask', () => {
     it('should delete a task', async () => {
-      const task = service.createTask(taskMock);
-      service.deleteTask({ id: task.id });
-      const tasks = service.getTasks();
+      await service.deleteTask({ id: 'id' });
 
-      expect(tasks).toStrictEqual([]);
+      expect(repository.delete).toBeCalled();
     });
   });
 
   describe('updateTask', () => {
     it('should update a task', async () => {
-      const task = service.createTask(taskMock);
-      const updatedTask = service.updateTask({
-        id: task.id,
+      await service.updateTask({
+        id: 'id',
         title: 'new title',
         description: 'new description',
       });
-      const tasks = service.getTasks();
 
-      expect(tasks).toStrictEqual([{ ...updatedTask, id: task.id }]);
+      expect(repository.update).toBeCalledWith({
+        title: 'new title',
+        description: 'new description',
+        id: 'id',
+      });
     });
 
     it('should throw an error if the task does not exists', () => {
-      expect(() =>
-        service.updateTask({
-          id: 'invalid-id',
-          title: 'new title',
-          description: 'new description',
-        }),
-      ).toThrowError('Task not found');
+      jest
+        .spyOn(repository, 'update')
+        .mockRejectedValueOnce(new TaskNotFoundException());
+      expect(
+        async () =>
+          await service.updateTask({
+            id: 'invalid-id',
+            title: 'new title',
+            description: 'new description',
+          }),
+      ).rejects.toThrowError('Task not found');
     });
   });
 });

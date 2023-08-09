@@ -1,7 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { TasksRepository } from '../../../src/tasks/tasks.repository';
 import { TasksController } from '../../../src/tasks/tasks.controller';
 import { TasksService } from '../../../src/tasks/tasks.service';
 import { taskMock } from './tasks.mock';
+import { PrismaClient } from '@prisma/client';
+import { TaskNotFoundException } from '../../../src/tasks/exceptions/task-not-found.exception';
 
 describe('TasksController', () => {
   let controller: TasksController;
@@ -10,7 +13,20 @@ describe('TasksController', () => {
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [TasksController],
-      providers: [TasksService],
+      providers: [
+        TasksService,
+        {
+          provide: TasksService,
+          useValue: {
+            getTasks: jest.fn(),
+            createTask: jest.fn().mockResolvedValue({ ...taskMock, id: 'id' }),
+            deleteTask: jest.fn(),
+            updateTask: jest.fn(),
+          },
+        },
+        TasksRepository,
+        PrismaClient,
+      ],
     }).compile();
 
     controller = app.get<TasksController>(TasksController);
@@ -18,61 +34,38 @@ describe('TasksController', () => {
   });
 
   describe('getTasks', () => {
-    let getTasksMock: jest.SpyInstance;
-
-    beforeEach(() => {
-      getTasksMock = jest.spyOn(service, 'getTasks');
-    });
-
     it('should call tasksService getTasks method', () => {
       controller.getTasks();
 
-      expect(getTasksMock).toBeCalled();
+      expect(service.getTasks).toBeCalled();
     });
   });
 
   describe('createTask', () => {
-    let createTaskMock: jest.SpyInstance;
-
-    beforeEach(() => {
-      createTaskMock = jest.spyOn(service, 'createTask');
-    });
-
     it('should call tasksService createTask with the correct value', async () => {
       controller.createTask(taskMock);
 
-      expect(createTaskMock).toBeCalledWith(taskMock);
+      expect(service.createTask).toBeCalledWith(taskMock);
     });
   });
 
   describe('deleteTask', () => {
-    let deleteTaskMock: jest.SpyInstance;
-    beforeEach(() => {
-      deleteTaskMock = jest.spyOn(service, 'deleteTask');
-    });
-
     it('should call tasksService deleteTask with the correct value', async () => {
       controller.deleteTask({ id: 'id' });
 
-      expect(deleteTaskMock).toBeCalledWith({ id: 'id' });
+      expect(service.deleteTask).toBeCalledWith({ id: 'id' });
     });
   });
 
   describe('updateTask', () => {
-    let updateTaskMock: jest.SpyInstance;
-
-    beforeEach(() => {
-      updateTaskMock = jest.spyOn(service, 'updateTask');
-    });
-
     it('should call tasksService updateTask with the correct value', async () => {
-      const task = controller.createTask(taskMock);
+      const task = await controller.createTask(taskMock);
       controller.updateTask(
         { id: task.id },
         { ...taskMock, title: 'new title' },
       );
 
-      expect(updateTaskMock).toBeCalledWith({
+      expect(service.updateTask).toBeCalledWith({
         id: task.id,
         ...taskMock,
         title: 'new title',
@@ -80,12 +73,17 @@ describe('TasksController', () => {
     });
 
     it('should throw an error if the task is not found', async () => {
-      expect(() =>
-        controller.updateTask(
-          { id: 'not-found' },
-          { ...taskMock, title: 'new title' },
-        ),
-      ).toThrowError('Task not found');
+      jest
+        .spyOn(service, 'updateTask')
+        .mockRejectedValue(new TaskNotFoundException());
+
+      expect(
+        async () =>
+          await controller.updateTask(
+            { id: 'not-found' },
+            { ...taskMock, title: 'new title' },
+          ),
+      ).rejects.toThrowError('Task not found');
     });
   });
 });
