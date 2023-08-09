@@ -14,16 +14,13 @@ jobs:
         uses: actions/checkout@v3 
       
       - name: 'Run docker compose up'
-        run: docker-compose up -d
+        run: docker-compose up -d;
 
-      - name: 'Access the backend container'
-        run: docker exec -it todo-backend bash;
+      - name: 'Running unit tests on backend container'
+        run: docker exec todo-backend yarn test;
 
-      - name: 'Unit tests'
-        run: yarn test;
+      - name: 'Running functional Tests on backend container'
+        run: docker exec yarn test:e2e;
 
-      - name: 'Functional Tests'
-        run: yarn test:e2e;
-
-      - name: 'Building project'
+      - name: 'Building project on backend container'
         run: yarn build;
