@@ -16,6 +16,9 @@ jobs:
       - name: 'Run docker compose up to setup the database'
         run: docker-compose up -d database;
 
+      - name: 'Building backend image'
+        run: docker-compose build backend;
+
       - name: 'Running unit tests on backend container'
         run: docker-compose run backend yarn test;
 
