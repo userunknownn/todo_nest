@@ -8,7 +8,7 @@ RUN yarn
 
 COPY . /todo-app
 
-RUN yarn global add jest
+RUN yarn global add jest ts-jest @nestjs/testing
 
 RUN ["git", "config", "--global", "--add", "safe.directory", "/todo-app"]
 
