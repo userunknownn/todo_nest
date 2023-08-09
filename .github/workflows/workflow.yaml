@@ -13,14 +13,14 @@ jobs:
       - name: 'Checkout code'
         uses: actions/checkout@v3 
       
-      - name: 'Run docker compose up'
-        run: docker-compose up -d;
+      - name: 'Run docker compose up to setup the database'
+        run: docker-compose up -d database;
 
       - name: 'Running unit tests on backend container'
-        run: docker exec todo-backend yarn test;
+        run: docker-compose run backend yarn test;
 
       - name: 'Running functional Tests on backend container'
-        run: docker exec yarn test:e2e;
+        run: docker-compose run backend yarn test:e2e;
 
       - name: 'Building project on backend container'
-        run: yarn build;
+        run: docker-compose run backend yarn build;
