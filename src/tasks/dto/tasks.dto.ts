@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString } from 'class-validator';
+import { Task } from '../types/task.type';
 
 export class CreateTaskRequest {
   @IsNotEmpty()
@@ -38,6 +39,8 @@ export class CreateTaskResponse {
 }
 
 export class DeleteTaskResponse {
+  title: string;
+  description: string;
   id: string;
 }
 
@@ -46,3 +49,5 @@ export class UpdateTaskResponse {
   description: string;
   id: string;
 }
+
+export class GetTasksResponse extends Array<Task> {}
