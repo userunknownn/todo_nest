@@ -8,6 +8,8 @@ RUN yarn
 
 COPY . /todo-app
 
+RUN yarn global add jest
+
 RUN ["git", "config", "--global", "--add", "safe.directory", "/todo-app"]
 
 EXPOSE 3000
