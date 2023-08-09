@@ -8,8 +8,12 @@ RUN yarn
 
 COPY . /todo-app
 
-RUN yarn global add jest ts-jest @nestjs/testing
-
 RUN ["git", "config", "--global", "--add", "safe.directory", "/todo-app"]
+
+COPY ./entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 3000
