@@ -10,6 +10,8 @@ COPY ./entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh
 
-CMD ["/entrypoint.sh"]
+COPY ./test-entrypoint.sh /test-entrypoint.sh
+
+RUN chmod +x /test-entrypoint.sh
 
 EXPOSE 3000

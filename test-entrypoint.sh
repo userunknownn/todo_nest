@@ -7,6 +7,11 @@ echo "Prisma orm setup";
 yarn prisma generate;
 yarn prisma migrate reset --force;
 
-echo "Start the application"
-yarn start;
+echo "Unit tests"
+yarn test;
+
+echo "Functional Tests"
+yarn test:e2e;
+
+
 
