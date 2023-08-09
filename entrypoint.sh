@@ -8,5 +8,5 @@ yarn prisma generate;
 yarn prisma migrate reset --force;
 
 echo "Start the application"
-yarn start;
+yarn start:dev;
 
