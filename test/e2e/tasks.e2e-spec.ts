@@ -3,6 +3,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../../src/app.module';
 import { PrismaClient } from '@prisma/client';
+import { TaskStatus } from '../../src/tasks/enums/task-status.enum';
 
 describe('TasksController (e2e)', () => {
   let app: INestApplication;
@@ -48,6 +49,7 @@ describe('TasksController (e2e)', () => {
         title: 'test',
         description: 'test',
         id: response.body.id,
+        status: 'In progress',
       });
     });
 
@@ -109,6 +111,7 @@ describe('TasksController (e2e)', () => {
         title: 'anotherTitle',
         description: 'test',
         id: response.body.id,
+        status: 'In progress',
       });
     });
 
@@ -120,6 +123,51 @@ describe('TasksController (e2e)', () => {
         .expect({
           message: 'Task not found',
           statusCode: 404,
+        });
+    });
+  });
+
+  describe('/tasks/:id/status (PATCH)', () => {
+    it('/tasks/:id/status (PATCH) success', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/tasks')
+        .send({ title: 'test', description: 'test' });
+
+      const patchReponse = await request(app.getHttpServer())
+        .patch(`/tasks/${response.body.id}/status`)
+        .send({ status: TaskStatus.DONE })
+        .expect(200);
+
+      expect(patchReponse.body).toStrictEqual({
+        title: 'test',
+        description: 'test',
+        id: response.body.id,
+        status: 'Done',
+      });
+    });
+
+    it('/tasks/:id/status (PATCH) fail when there is no task with that id', async () => {
+      return request(app.getHttpServer())
+        .patch('/tasks/someId/status')
+        .send({ status: TaskStatus.DONE })
+        .expect(404)
+        .expect({
+          message: 'Task not found',
+          statusCode: 404,
+        });
+    });
+
+    it('/tasks/:id/status (PATCH) fail when a invalid status is sent', async () => {
+      return request(app.getHttpServer())
+        .patch('/tasks/someId/status')
+        .send({ status: 'invalid status' })
+        .expect(400)
+        .expect({
+          message: [
+            'status must be one of the following values: In progress, Done',
+          ],
+          error: 'Bad Request',
+          statusCode: 400,
         });
     });
   });

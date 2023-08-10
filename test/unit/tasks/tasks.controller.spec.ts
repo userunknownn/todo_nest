@@ -5,6 +5,7 @@ import { TasksService } from '../../../src/tasks/tasks.service';
 import { taskMock } from './tasks.mock';
 import { PrismaClient } from '@prisma/client';
 import { TaskNotFoundException } from '../../../src/tasks/exceptions/task-not-found.exception';
+import { TaskStatus } from '../../../src/tasks/enums/task-status.enum';
 
 describe('TasksController', () => {
   let controller: TasksController;
@@ -22,6 +23,7 @@ describe('TasksController', () => {
             createTask: jest.fn().mockResolvedValue({ ...taskMock, id: 'id' }),
             deleteTask: jest.fn(),
             updateTask: jest.fn(),
+            updateTaskStatus: jest.fn(),
           },
         },
         TasksRepository,
@@ -84,6 +86,32 @@ describe('TasksController', () => {
             { ...taskMock, title: 'new title' },
           ),
       ).rejects.toThrowError('Task not found');
+    });
+  });
+
+  describe('updateTaskStatus', () => {
+    it('should call tasks service updateTaskStatus', async () => {
+      const task = await controller.createTask(taskMock);
+      controller.updateTaskStatus({ id: task.id }, { status: TaskStatus.DONE });
+
+      expect(service.updateTaskStatus).toBeCalledWith({
+        id: task.id,
+        status: TaskStatus.DONE,
+      });
+    });
+
+    it('should throw an error if the task is not found', async () => {
+      jest
+        .spyOn(service, 'updateTaskStatus')
+        .mockRejectedValue(new TaskNotFoundException());
+
+      expect(
+        async () =>
+          await controller.updateTaskStatus(
+            { id: 'not-found' },
+            { status: TaskStatus.DONE },
+          ),
+      ).rejects.toThrow('Task not found');
     });
   });
 });
