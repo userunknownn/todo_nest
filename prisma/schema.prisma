@@ -11,4 +11,5 @@ model Task {
   id     String     @id  @db.VarChar(255)
   title    String   @db.VarChar(255)
   description   String?   @db.VarChar(255)
+  status    String    @db.VarChar(255)
 }
