@@ -4,6 +4,7 @@ import { v4 as uuid } from 'uuid';
 import { Task } from './types/task.type';
 import { TaskNotFoundException } from './exceptions/task-not-found.exception';
 import { TasksRepository } from './tasks.repository';
+import { TaskStatus } from './enums/task-status.enum';
 
 @Injectable()
 export class TasksService {
@@ -25,6 +26,14 @@ export class TasksService {
   async updateTask(task: Task): Promise<Task> {
     try {
       return await this.repository.update(task);
+    } catch {
+      throw new TaskNotFoundException();
+    }
+  }
+
+  async updateTaskStatus({ id, status }: { id: string; status: TaskStatus }) {
+    try {
+      return await this.repository.updateStatus(id, status);
     } catch {
       throw new TaskNotFoundException();
     }

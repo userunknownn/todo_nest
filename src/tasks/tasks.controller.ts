@@ -18,6 +18,7 @@ import {
   UpdateTaskPatchRequest,
   UpdateTaskRequest,
   UpdateTaskResponse,
+  UpdateTaskStatusRequest,
 } from './dto/tasks.dto';
 
 @Injectable()
@@ -46,5 +47,13 @@ export class TasksController {
     @Body() request: UpdateTaskPatchRequest,
   ): Promise<UpdateTaskResponse> {
     return this.service.updateTask({ ...id, ...request });
+  }
+
+  @Patch(':id/status')
+  updateTaskStatus(
+    @Param() id: UpdateTaskRequest,
+    @Body() request: UpdateTaskStatusRequest,
+  ): Promise<UpdateTaskResponse> {
+    return this.service.updateTaskStatus({ ...id, ...request });
   }
 }

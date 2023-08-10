@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { TaskStatus } from './enums/task-status.enum';
 import { Task } from './types/task.type';
 
 @Injectable()
@@ -11,7 +12,9 @@ export class TasksRepository {
   }
 
   async create(task: Task): Promise<Task> {
-    return await this.prismaClient.task.create({ data: { ...task } });
+    return await this.prismaClient.task.create({
+      data: { ...task, status: TaskStatus.IN_PROGRESS },
+    });
   }
 
   async delete(id: string): Promise<Task> {
@@ -22,6 +25,14 @@ export class TasksRepository {
     const task = await this.prismaClient.task.update({
       where: { id },
       data: { title, description },
+    });
+    return task;
+  }
+
+  async updateStatus(id: string, status: TaskStatus): Promise<Task> {
+    const task = await this.prismaClient.task.update({
+      where: { id },
+      data: { status: status },
     });
     return task;
   }
