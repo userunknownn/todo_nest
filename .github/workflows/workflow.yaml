@@ -12,9 +12,6 @@ jobs:
       - name: 'Checkout code'
         uses: actions/checkout@v3 
       
-      - name: 'Run docker compose up to setup the database'
-        run: docker-compose up -d database;
-
       - name: 'Running Tests on backend test container'
-        run: docker-compose run --rm backend-test;
+        run: docker-compose -f docker-compose.test.yaml up;
 
