@@ -16,5 +16,5 @@ jobs:
         run: docker-compose up -d database;
 
       - name: 'Running Tests on backend test container'
-        run: docker-compose run --rm backend-test;
+        run: docker-compose -f docker-compose.test.yaml run --rm backend-test;
 
