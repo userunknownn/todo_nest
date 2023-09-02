@@ -20,8 +20,10 @@ import {
   UpdateTaskResponse,
   UpdateTaskStatusRequest,
 } from './dto/tasks.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Injectable()
+@ApiTags('tasks')
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly service: TasksService) {}
