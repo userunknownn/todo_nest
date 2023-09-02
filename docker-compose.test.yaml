@@ -1,0 +1,18 @@
+services: 
+ 
+  backend-test: 
+    build: . 
+    environment:  
+      - DATABASE_URL=mysql://root:root@database:3306/todo 
+    container_name: todo-backend-test 
+    entrypoint: ["/test-entrypoint.sh"] 
+    depends_on: 
+      - database 
+
+  database:
+    image: mysql:8.0-debian
+    restart: always
+    environment:
+      - MYSQL_DATABASE=todo
+      - MYSQL_ROOT_PASSWORD=root
+    container_name: todo-database
